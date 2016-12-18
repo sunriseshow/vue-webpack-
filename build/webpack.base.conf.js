@@ -6,7 +6,7 @@ var postcss = [
   require('autoprefixer')(),
   require('postcss-px2rem')({remUnit: 50})
 ]
-var imagemin = require("imagemin");
+var imagemin=require("imagemin");
 
 var env = process.env.NODE_ENV
 // check env & config/index.js to decide weither to enable CSS Sourcemaps for the
@@ -15,10 +15,34 @@ var cssSourceMapDev = (env === 'development' && config.dev.cssSourceMap)
 var cssSourceMapProd = (env === 'production' && config.build.productionSourceMap)
 var useCssSourceMap = cssSourceMapDev || cssSourceMapProd
 
+var query={};
+if(env=== 'development'){
+
+
+  query= {
+    multiple:[
+      { search: '\\$\\{tps\\.domain\\}', replace: '/list',flags:"gi" },
+      { search: '\\$\\{mobile\\.image\\.host\\.url\\}', replace: 'http://img.suning.cn/project/mtps' ,flags:"gi"},
+      { search: '\\$\\{mobile\\.css\\.host\\.url\\}', replace: 'http://sitres.suning.cn/project/mtps/' ,flags:"gi"},
+      { search: '\\$\\{mobile\\.js\\.host\\.url\\}', replace: 'http://sitres.suning.cn/project/mtps/' ,flags:"gi"},
+      { search: '\\$\\{versionNo\\}', replace: '411,255',flags:"gi" }
+
+
+    ]
+  };
+}
+else{
+  query={
+
+  }
+}
+
+var changequery=JSON.stringify(query);
 module.exports = {
   entry: {
-    report: './src/main.js',
-    zepto: ['./src/assets/js/zepto-1.1.6.js']
+    report: './src/main.js'
+    //,
+    //zepto:['./src/assets/js/zepto-1.1.6.js']
   },
   output: {
     path: config.build.assetsRoot,
@@ -39,7 +63,7 @@ module.exports = {
     fallback: [path.join(__dirname, '../node_modules')]
   },
   module: {
-    //preLoaders: [
+    // preLoaders: [
     //  {
     //    test: /\.vue$/,
     //    loader: 'eslint',
@@ -52,12 +76,23 @@ module.exports = {
     //    include: projectRoot,
     //    exclude: /node_modules/
     //  }
-    //],
+    // ],
+
+
     loaders: [
       {
         test: /\.(htm|html)$/,
         loader: 'raw'
-      },
+      }
+      ,
+      {
+        test: /\.(js|html|vue)$/i,
+        loader: 'string-replace',
+        query: query,
+        //include: projectRoot,
+        exclude: /node_modules/
+      }
+      ,
       {
         test: /\.vue$/,
         loader: 'vue'
@@ -69,14 +104,19 @@ module.exports = {
         include: projectRoot,
         exclude: /node_modules/
       },
+
       {
+
+
         test: /\.json$/,
         loader: 'json'
       },
+
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
         loader:'url?limit=3500&name='+utils.assetsPath("images/[name].[ext]?v=[hash:5]")+''
       },
+
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
         loader: 'improved-image-webpack-loader',
@@ -88,7 +128,7 @@ module.exports = {
 
           },
           mozjpeg: {
-            quality: 60,
+            quality: 70,
             progressive: true
           },
           optipng: {
@@ -101,8 +141,6 @@ module.exports = {
           }
         }
       },
-//{ test: /\.(jpe?g|png|gif|svg)$/i, loaders: [ 'url?limit=3500&name='+utils.assetsPath("images/[name].[ext]?v=[hash:5]")+'', 'img?minimize' ] },
-
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
         loader: 'url',
@@ -111,9 +149,12 @@ module.exports = {
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
       }
-
     ]
   },
+  // eslint: {
+  //  formatter: require('eslint-friendly-formatter')
+  // },
+
   imageOptimizeLoader: {
     optimizer: {
       covertPngToJpg: true
@@ -125,7 +166,7 @@ module.exports = {
     }
     ,
     mozjpeg: {
-      //targa: false,
+      targa: false,
       progressive: false,
       quality: 70
     }
@@ -134,37 +175,15 @@ module.exports = {
       plugins: [
         {removeComments: true},
         {sortAttrs: true},
-        {minifyStyles: true},
+        {minifyStyles: true}
       ]
     }
   },
-//imagemin: {
-//  gifsicle: { interlaced: false },
-//  jpegtran: {
-//    progressive: true,
-//    arithmetic: false
-//  },
-//  optipng: { optimizationLevel: 5 },
-//  pngquant: {
-//    floyd: 0.5,
-//    speed: 2
-//  },
-//  svgo: {
-//    plugins: [
-//      { removeTitle: true },
-//      { convertPathData: false }
-//    ]
-//  },
-//  mozjpeg:{
-//    progressive: false,
-//    quality:80
-//  }
-//},
   postcss: postcss,
 
   vue: {
-    loaders: utils.cssLoaders({sourceMap: useCssSourceMap}),
+    //loaders: utils.cssLoaders({ sourceMap: useCssSourceMap }),
+    loaders:Object.assign({ js: 'string-replace?'+changequery+'!babel' }, utils.cssLoaders({ sourceMap: config.build.productionSourceMap})),
     postcss: postcss
   }
-}
-;
+};

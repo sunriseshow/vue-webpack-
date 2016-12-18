@@ -17,8 +17,8 @@ var webpackConfig = merge(baseWebpackConfig, {
   devtool: config.build.productionSourceMap ? '#source-map' : false,
   output: {
     path: config.build.assetsRoot,
-    filename: utils.assetsPath('js/[name].js?v=[chunkhash:5]'),
-    chunkFilename: utils.assetsPath('js/[id].js?v=[chunkhash:5]')
+    filename: utils.assetsPath('js/[name].min.js?v=[chunkhash:5]'),
+    chunkFilename: utils.assetsPath('js/[id].min.js?v=[chunkhash:5]')
   },
   vue: {
     loaders: utils.cssLoaders({
@@ -38,7 +38,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     }),
     new webpack.optimize.OccurrenceOrderPlugin(),
     // extract css into its own file
-    new ExtractTextPlugin(utils.assetsPath('css/[name].css?v=[contenthash:5]')),
+    new ExtractTextPlugin(utils.assetsPath('css/[name].min.css?v=[contenthash:5]')),
 
     // generate dist index.html with correct asset hash for caching.
     // you can customize output by editing /index.html
@@ -56,7 +56,7 @@ var webpackConfig = merge(baseWebpackConfig, {
         // more options:
         // https://github.com/kangax/html-minifier#options-quick-reference
       },
-      chunks:['zepto','common.js',"report"],
+      //chunks:['common.js',"report"],
 
       // necessary to consistently work with multiple chunks via CommonsChunkPlugin
       chunksSortMode: 'dependency'

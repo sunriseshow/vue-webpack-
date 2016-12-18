@@ -12,32 +12,14 @@ Object.keys(baseWebpackConfig.entry).forEach(function (name) {
 
 module.exports = merge(baseWebpackConfig, {
   module: {
+    loaders:
+      utils.styleLoaders({ sourceMap: config.dev.cssSourceMap })
 
-    loaders:[
-      utils.styleLoaders({ sourceMap: config.dev.cssSourceMap }),
-      {
-        test: /\.(js|html)$/i,
-        loader: 'string-replace',
-        query: {
-          multiple: [
-            { search: '${tps.domain}', replace: '.suning.com' },
-            { search: '${mobile.image.host.url}', replace: 'http://img.suning.cn/project/mtps' },
-            { search: '${mobile.css.host.url}', replace: 'http://res.suning.cn/project/mtps' },
-            { search: '${mobile.js.host.url}', replace: 'http://res.suning.cn/project/mtps' },
-            { search: '${versionNo}', replace: '411,255' }
-
-
-          ]
-        },
-        //include: projectRoot,
-        exclude: /node_modules/
-      }
-
-    ]
   },
   // eval-source-map is faster for development
   devtool: '#eval-source-map',
   plugins: [
+
     new webpack.DefinePlugin({
       'process.env': config.dev.env
     }),
